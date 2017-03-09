@@ -1,0 +1,856 @@
+﻿<UserControl x:Class="ProMonitoringService_WPFClient.Controls.ACLView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ProMonitoringService_WPFClient.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             Name="ThisUserControl"
+             d:DesignHeight="300"
+             d:DesignWidth="1000"
+             FontSize="10"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="DescriptionText_TextBox_Style" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="ButtonStyle2" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" 
+                                BorderBrush="Black"
+                                BorderThickness="1" 
+                                Background="{TemplateBinding Background}" 
+                                SnapsToDevicePixels="true"
+                                CornerRadius="10">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <!--<Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>-->
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <!--<Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>-->
+                            </Trigger>
+                            <!--<Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>-->
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="AUTO" />
+                <RowDefinition Height="AUTO" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                    <TextBlock FontSize="24" Foreground="#868686">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="Source base" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSource, ElementName=ThisUserControl}" Value="False">
+                                        <Setter Property="Text" Value="Destination base" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Button Name="SearchACL_Button"
+                            Width="AUTO"
+                            Height="AUTO"
+                            Margin="10, 0, 0, 0"
+                            Click="SearchACL_Button_Click"
+                            Content="Search ACL"
+                            FontSize="14"
+                            Padding="5"
+                            Style="{StaticResource MainWindow_Button_Style}"
+                            Visibility="{Binding IsSource,
+                                                 ElementName=ThisUserControl,
+                                                 Converter={StaticResource BoolToVisibilityConverter},
+                                                 ConverterParameter=visibleWhenTrue}" 
+                            />
+                </StackPanel>
+                <Rectangle Height="1"
+                           Margin="2"
+                           HorizontalAlignment="Stretch"
+                           DockPanel.Dock="Bottom"
+                           Fill="Black" />
+            </DockPanel>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left" Width="860" >
+                <StackPanel.Resources>
+                    <Style x:Key="ADV_SIM_ToggleButton_Style" TargetType="ToggleButton">
+                        <Setter Property="Foreground" Value="Black" />
+                        <Setter Property="Background" Value="#FAFAFB" />
+                        <Setter Property="BorderBrush" Value="#EAEAEB" />
+                        <!--<Setter Property="VerticalContentAlignment" Value="Bottom"/>-->
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ToggleButton">
+                                    <Border Width="40"
+                                            Height="20"
+                                            HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                            Background="{TemplateBinding Background}"
+                                            CornerRadius="10">
+                                        <Canvas Width="40" Height="20">
+                                            <Canvas.Clip>
+                                                <RectangleGeometry Rect="0 0 40 20" />
+                                            </Canvas.Clip>
+                                            <Border Name="SIM_Border"
+                                                    Width="40"
+                                                    Height="20"
+                                                    CornerRadius="10">
+                                                <Border.RenderTransform>
+                                                    <TranslateTransform X="0" Y="0" />
+                                                </Border.RenderTransform>
+                                                <TextBlock HorizontalAlignment="Center" Text="SIM" FontSize="15" Foreground="Gray" 
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                            <Border Name="ADV_Border"
+                                                    Canvas.Left="41"
+                                                    Width="40"
+                                                    Height="20"
+                                                    Background="#00A988"
+                                                    CornerRadius="10">
+                                                <Border.RenderTransform>
+                                                    <TranslateTransform X="0" Y="0" />
+                                                </Border.RenderTransform>
+                                                <TextBlock HorizontalAlignment="Center" Text="ADV" FontSize="15" Foreground="White"
+                                                           VerticalAlignment="Center"/>
+                                            </Border>
+                                        </Canvas>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Duration="00:00:1"
+                                                                         Storyboard.TargetName="ADV_Border"
+                                                                         Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                                                         To="-41" />
+                                                        <DoubleAnimation Duration="00:00:1"
+                                                                         Storyboard.TargetName="SIM_Border"
+                                                                         Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                                                         To="-41" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Duration="00:00:1"
+                                                                         Storyboard.TargetName="ADV_Border"
+                                                                         Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                                                         To="0" />
+                                                        <DoubleAnimation Duration="00:00:1"
+                                                                         Storyboard.TargetName="SIM_Border"
+                                                                         Storyboard.TargetProperty="(Border.RenderTransform).(TranslateTransform.X)"
+                                                                         To="0" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <Style x:Key="Icon_Image_Style" TargetType="Image">
+                        <Setter Property="MaxHeight" Value="20" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Resources>
+                <local:PopupedContentControl x:Name="CrateACLClone_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Create ACL clone">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-copy-light-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Save_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Save">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-save-light-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Clear_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Clear">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-cut-light-blue.png" Style="{StaticResource Icon_Image_Style}" MouseUp="Image_MouseUp" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="ChangeACLBase_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Change ACL base">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-arrow-left-light-blue.png" Style="{StaticResource Icon_Image_Style}" MouseUp="Image_MouseUp_1" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="SetDefultACL_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Set default ACL">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-home-light-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Delete_PopupedContentControl"
+                                             Margin="2"
+                                             PopupContent="Delete">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-trash-red.png" Style="{StaticResource Icon_Image_Style}" MouseUp="Image_MouseUp_2" />
+                </local:PopupedContentControl>
+                <ToggleButton Margin="2" Style="{StaticResource ADV_SIM_ToggleButton_Style}" />
+                <TextBox MinWidth="100"
+                         Margin="2"
+                         BorderBrush="Black"
+                         BorderThickness="1"
+                         FontSize="14"
+                         Padding="1"
+                         Style="{StaticResource InputTextBox_Style}"
+                         Text="{Binding Name}" GotFocus="TextBox_GotFocus" />
+                <TextBox MinWidth="100"
+                         Margin="2"
+                         BorderBrush="Black"
+                         BorderThickness="1"
+                         FontSize="14"
+                         Padding="1"
+                         
+                         Style="{StaticResource InputTextBox_Style}"
+                         Text="{Binding Description}" GotFocus="TextBox_GotFocus_1" />
+            </StackPanel>
+            <Button x:Name="defButton"
+                Grid.Row="1" 
+                    HorizontalAlignment="Right"
+                    Content="DEF"
+                    FontSize="14"
+                    Width="40"
+                    Height="20"
+                    Style="{DynamicResource ButtonStyle2}"
+                    Foreground="Black"/>
+            <Border Grid.Row="2" Style="{StaticResource Border_DefaultStyle}">
+                <Grid TextBlock.Foreground="#808080">
+                    <Grid.Background>
+                        <SolidColorBrush Color="#ffffff" Opacity="0.5"/>
+                    </Grid.Background>
+                    <Grid.Resources>
+                        <Style x:Key="OptionsBorder_Style" TargetType="Border">
+                            <Setter Property="Padding" Value="2, 1, 2, 1" />
+                            <Setter Property="Background" Value="White" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="Black" />
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="#66AFE9" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        <Style x:Key="Option_ToggleButton_Style" TargetType="ToggleButton">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Name="Root_Border"
+                                                Background="#808080"
+                                                BorderBrush="Black"
+                                                BorderThickness="2"
+                                                Padding="1, 7, 1, 7">
+                                            <ContentPresenter />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter TargetName="Root_Border" Property="Background" Value="#D3D3D3" />
+                                                <Setter TargetName="Root_Border" Property="BorderBrush" Value="#B7B7B7" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style x:Key="Arrow_Image_Style" TargetType="Image">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Setter Property="MaxWidth" Value="14" />
+                            <Setter Property="Margin" Value="1" />
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="AUTO" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="AUTO" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                        <ColumnDefinition Width="AUTO" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource DescriptionText_TextBox_Style}">
+                        then
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="1"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="3"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="4"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        then
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="5"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="6"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        then
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="7"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="8"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        then
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="9"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="10"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        if
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="11"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="13"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="14"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        if
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="15"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="17"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="18"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        if
+                    </TextBlock>
+                    <Image Grid.RowSpan="3"
+                           Grid.Column="19"
+                           Source="pack://application:,,,/Resources/Icons/fa-long-arrow-left.png"
+                           Style="{StaticResource Arrow_Image_Style}" />
+                    <TextBlock Grid.Column="20"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        if
+                    </TextBlock>
+                    <Border Grid.Row="1" Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="IP port">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="IP_PortOption_ToggleButton_1"
+                                                  Checked="IP_PortOption_ToggleButton_Checked"
+                                                  Content="I"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="IP port">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="IP_PortOption_ToggleButton"
+                                                  Checked="IP_PortOption_ToggleButton_Checked"
+                                                  Content="I"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Process">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="ProcessOption_ToggleButton"
+                                                  Checked="ProcessOption_ToggleButton_Checked"
+                                                  Content="P"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" 
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="IP port">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="AppOption_ToggleButton"
+                                                  Checked="AppOption_ToggleButton_Checked"
+                                                  Content="A"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="2"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Internet">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Internet_ToggleButton"
+                                                  Content="I"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" 
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Specific tunnel">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="SpecificTunnelOption_ToggleButton"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" Checked="SpecificTunnelOption_ToggleButton_Checked"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Specific group">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="SpecificGroupOption_ToggleButton"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" Checked="SpecificGroupOption_ToggleButton_Checked"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="My cloud">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="MyCloudOption_ToggleButton"
+                                                  Content="T"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="My clouds">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="MyCloudsOption_ToggleButton"
+                                                  Content="M"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Every cloud">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="EveryCloudOption_ToggleButton"
+                                                  Content="E"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="4"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="New destination">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="NewDst_ToggleButton"
+                                                  Checked="NewDst_ToggleButton_Checked"
+                                                  Content="N"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Specific tunnel">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="SpecificTunnelOption_FWD_ToggleButton"
+                                                  Checked="SpecificTunnelOption_FWD_ToggleButton_Checked"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" 
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="6"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Shaping">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Shaping_ToggleButton"
+                                                  Checked="Shaping_ToggleButton_Checked"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="8"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Shaping">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Path_ToggleButton"
+                                                  Content="P"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="10"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Deny all">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="DenyAll_ToggleButton"
+                                                  Content="D"
+                                                  Style="{StaticResource Option_ToggleButton_Style}" 
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+
+                            <local:PopupedContentControl PopupContent="Apps">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Apps_ToggleButton"
+                                                  Checked="Apps_ToggleButton_Checked"
+                                                  Content="A"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="IP port protocol">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="IP_PortProtocol_ToggleButton"
+                                                  Checked="IP_PortProtocol_ToggleButton_Checked"
+                                                  Content="I"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Websites">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="WebSites_ToggleButton"
+                                                  Checked="WebSites_ToggleButton_Checked"
+                                                  Content="W"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="12"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Deny all">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="NewDst_Aliasing_ToggleButton"
+                                                  Content="N"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" Checked="NewDst_Aliasing_ToggleButton_Checked" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="14"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <Grid>
+                            <Rectangle HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       Fill="#00A998"
+                                       Visibility="{Binding IsSource,
+                                                            ElementName=ThisUserControl,
+                                                            Converter={StaticResource BoolToVisibilityConverter},
+                                                            ConverterParameter=visibleWhenTrue}" />
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding IsSource, ElementName=ThisUserControl, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=visibleWhenFalse}">
+                                <local:PopupedContentControl PopupContent="Internet">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="Internet_Source_ToggleButton"
+                                                      Content="I"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                                <local:PopupedContentControl PopupContent="Specific tunnel">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="SpecificTunnel_ToggleButton"
+                                                      Content="S"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                                <local:PopupedContentControl PopupContent="Specific Group">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="SpecificGroup_ToggleButton"
+                                                      Content="G"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                                <local:PopupedContentControl PopupContent="This cloud">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="ThisCloud_ToggleButton"
+                                                      Content="T"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                                <local:PopupedContentControl PopupContent="My clouds">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="MyClouds_ToggleButton"
+                                                      Content="M"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                                <local:PopupedContentControl PopupContent="Every cloud">
+                                    <local:PopupedContentControl.Content>
+                                        <ToggleButton Name="EveryCloud_ToggleButton"
+                                                      Content="E"
+                                                      Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                    </local:PopupedContentControl.Content>
+                                </local:PopupedContentControl>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="16"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Shaping">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Shaping_QOS_ToggleButton"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" Checked="Shaping_QOS_ToggleButton_Checked" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="18"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Deny all">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="DenyAll_Firewall_ToggleButton"
+                                                  Content="D"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Allow all">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="AllowAll_Firewall_ToggleButton"
+                                                  Content="A"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Processes">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Processes_ToggleButton"
+                                                  Checked="Processes_ToggleButton_Checked"
+                                                  Content="P"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Apps">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Apps_Firewall_ToggleButton"
+                                                  Checked="Apps_Firewall_ToggleButton_Checked"
+                                                  Content="A"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1"
+                            Grid.Column="20"
+                            Style="{StaticResource OptionsBorder_Style}">
+                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <local:PopupedContentControl PopupContent="Bind all">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="BindAll_QOS_ToggleButton"
+                                                  Content="B"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14"/>
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Processes">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Processes_Binding_ToggleButton"
+                                                  Checked="Processes_Binding_ToggleButton_Checked"
+                                                  Content="P"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Apps">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Apps_Binding_ToggleButton"
+                                                  Checked="Apps_Binding_ToggleButton_Checked"
+                                                  Content="A"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Apps">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Apps_Binding_ToggleButton_1"
+                                                  Checked="Apps_Binding_ToggleButton_Checked"
+                                                  Content="S"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                            <local:PopupedContentControl PopupContent="Apps">
+                                <local:PopupedContentControl.Content>
+                                    <ToggleButton Name="Apps_Binding_ToggleButton_2"
+                                                  Checked="Apps_Binding_ToggleButton_Checked"
+                                                  Content="M"
+                                                  Style="{StaticResource Option_ToggleButton_Style}"
+                                                  FontSize="14" />
+                                </local:PopupedContentControl.Content>
+                            </local:PopupedContentControl>
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Grid.Row="2"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Final Dst.
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="2"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Destination
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="4"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        FWD
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="6"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        QOS
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="8"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Routing
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="10"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Firewall
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="12"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Aliasing
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="14"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Source
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="16"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        QOS
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="18"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Firewall
+                    </TextBlock>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="20"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource DescriptionText_TextBox_Style}">
+                        Binding/TOS
+                    </TextBlock>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

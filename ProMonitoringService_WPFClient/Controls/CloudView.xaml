@@ -1,0 +1,622 @@
+﻿<UserControl x:Class="ProMonitoringService_WPFClient.Controls.CloudView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ProMonitoringService_WPFClient.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:ProMonitoringService_WPFClient.ViewModels"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="Icon_Image_Style" TargetType="Image">
+            <Setter Property="Height" Value="16" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Cursor" Value="Hand" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="UpperBorder_Style" TargetType="{x:Type Border}">
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1, 1, 1, 0" />
+            <Setter Property="TextBlock.FontSize" Value="14" />
+        </Style>
+        <Style x:Key="LeftScrollViewer_Style" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ScrollBar Name="PART_VerticalScrollBar"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                       Value="{TemplateBinding VerticalOffset}" />
+
+                            <ScrollContentPresenter Grid.Column="1" Margin="10, 0, 0, 0" />
+                            <ScrollBar Name="PART_HorizontalScrollBar"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       Orientation="Horizontal"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                       Value="{TemplateBinding HorizontalOffset}" />
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Expander_Style" TargetType="Expander">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition MaxHeight="300" />
+                            </Grid.RowDefinitions>
+                            <Border Name="HeaderIcons_Border"
+                                    BorderBrush="Black"
+                                    BorderThickness="2"
+                                    CornerRadius="10"
+                                    Padding="5"
+                                    >
+                                <Border.Background >
+                                    <SolidColorBrush Color="Black" Opacity="0.2"/>
+                                </Border.Background>
+                                <ContentPresenter ContentSource="Header" />
+                            </Border>
+                            <Border Name="ContentContainer_Border"
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="15"
+                                    Margin="15, 0, 15, 10"
+                                    BorderBrush="Black"
+                                    BorderThickness="2, 0, 2, 2"
+                                    CornerRadius="0, 0, 10, 10"
+                                    Padding="10"
+                                    Visibility="Collapsed">
+                                <ScrollViewer MaxHeight="250" Style="{StaticResource LeftScrollViewer_Style}">
+                                    <ContentPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Expander.IsExpanded" Value="True">
+                                <Setter TargetName="ContentContainer_Border" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderIcons_Border" Property="Border.BorderBrush" Value="#66AFE9" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO" />
+            <RowDefinition Height="AUTO" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="AUTO" />
+        </Grid.RowDefinitions>
+        <Grid Margin="0, 80, 0, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="AUTO" />
+                <ColumnDefinition Width="AUTO" />
+            </Grid.ColumnDefinitions>
+            <TextBlock FontSize="20" Foreground="#2C2C2C">
+                <Run Text="{Binding Name}" />
+                <Run Text="(" />
+                <Run Text="Total cost =" />
+                <Run Text="{Binding TotalCost}" />
+                <Run Text=")" />
+            </TextBlock>
+            <ToggleButton Name="Something_ToggleButton"
+                          Grid.Column="1"
+                          HorizontalAlignment="Right"
+                          Style="{StaticResource ToggleButton_DefaultStyle}" />
+            <Button Name="DeleteCloud_Button"
+                    Grid.Column="2"
+                    Background="Transparent"
+                    Click="DeleteCloud_Button_Click"
+                    Style="{StaticResource Button_DefaultStyle}">
+                <Image Grid.Column="2"
+                       MaxWidth="24"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Source="pack://application:,,,/Resources/garbage.png" />
+            </Button>
+        </Grid>
+        <Border Grid.Row="1"
+                Margin="15, 0, 15, 20"
+                Background="#cfe2f3"
+                Style="{StaticResource Border_DefaultStyle}"
+                >
+            <Grid>
+                <Grid.RowDefinitions />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Name="ACL_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="CreateACL_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="AddTunnels_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="SaveAll_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="SelectAllTunnels_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="Groups_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="TunnelName_ColumnDefiniton" Width="11.5*" />
+                    <ColumnDefinition Name="BidirectionMode_ColumnDefiniton" Width="AUTO" />
+                    <ColumnDefinition Name="Location_ColumnDefiniton" Width="16.25*" />
+                    <ColumnDefinition Name="VPN_IP_ColumnDefiniton" Width="7*" />
+                    <ColumnDefinition Name="Points_ColumnDefiniton" Width="13.25*" />
+                    <ColumnDefinition Name="Real_IP_ColumnDefiniton" Width="13.25*" />
+                    <ColumnDefinition Name="Gateway_ColumnDefiniton" Width="13.25*" />
+                    <ColumnDefinition Name="Spacer" Width="15*" />
+                </Grid.ColumnDefinitions>
+                <local:PopupedContentControl x:Name="ACL_PopupedContentControl"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="ACL">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-eye-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="CrateACL_PopupedContentControl"
+                                             Grid.Column="1"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Create ACl">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-gears-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="AddTunnels_PopupedContentControl"
+                                             Grid.Column="2"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Add tunnels">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-plus-circle.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="SaveAll_PopupedContentControl"
+                                             Grid.Column="3"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Save all">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-save-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="SelectAllTunnels_PopupedContentControl"
+                                             Grid.Column="4"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Select all tunnels">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-square-o.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Groups_PopupedContentControl"
+                                             Grid.Column="5"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Groups">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-group-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="TunnelName_PopupedContentControl"
+                                             Grid.Column="6"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Tunnel name">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-gear-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="BidirectionMode_PopupedContentControl"
+                                             Grid.Column="7"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Bidirection mode">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/Resources/Icons/fa-chevron-left-black.png" Style="{StaticResource Icon_Image_Style}" />
+                        <Image Source="pack://application:,,,/Resources/Icons/fa-chevron-right-black.png" Style="{StaticResource Icon_Image_Style}" />
+                    </StackPanel>
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Location_PopupedContentControl"
+                                             Grid.Column="8"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Location">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-globe-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="VPN_IP_PopupedContentControl"
+                                             Grid.Column="9"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="VPN IP">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-map-pin-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Points_PopupedContentControl"
+                                             Grid.Column="10"
+                                             HorizontalAlignment="Center"
+                                             IsForACLView="True"
+                                             PopupContent="Points">
+                    <Image Source="pack://application:,,,/Resources/Icons/fa-dollar-black.png" Style="{StaticResource Icon_Image_Style}" />
+                </local:PopupedContentControl>
+                <local:PopupedContentControl x:Name="Real_IP_PopupedContentControl"
+                                             Grid.Column="11"
+                                             HorizontalAlignment="Center"
+                                             Content="Real IP"
+                                             IsForACLView="True"
+                                             PopupContent="Real IP" />
+                <local:PopupedContentControl x:Name="Gateway_PopupedContentControl"
+                                             Grid.Column="12"
+                                             HorizontalAlignment="Center"
+                                             Content="Gateway"
+                                             IsForACLView="True"
+                                             PopupContent="Gateway mode" />
+            </Grid>
+        </Border>
+        <ListBox x:Name="TunnelsView_ListBox"
+                 Grid.Row="2"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 ItemsSource="{Binding}"
+                 SelectionMode="Multiple">
+            <ListBox.Resources>
+                <Style x:Key="Checkbox_Style" TargetType="{x:Type CheckBox}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Cursor" Value="Hand" />
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type CheckBox}">
+                                <Grid>
+                                    <Image Name="CheckSign_Image"
+                                           Height="20"
+                                           Source="pack://application:,,,/Resources/Icons/fa-square-o.png" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="CheckSign_Image" Property="Image.Source" Value="pack://application:,,,/Resources/Icons/fa-check-square-o.png" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style x:Key="CheckBox_RedGreen_Style" TargetType="{x:Type CheckBox}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Cursor" Value="Hand"/>
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type CheckBox}">
+                                <Grid>
+                                    <Image Name="CheckSign_Image"
+                                           Height="15"
+                                           Source="pack://application:,,,/Resources/Icons/fa-times.png" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter TargetName="CheckSign_Image" Property="Image.Source" Value="pack://application:,,,/Resources/Icons/fa-check.png" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.Resources>
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Margin" Value="0, 0, 0, 10" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Grid MinWidth="1070">
+                                    <Grid.Resources>
+                                        <Style x:Key="UpperBorder_Style" TargetType="{x:Type Border}">
+                                            <Setter Property="BorderBrush" Value="Gray" />
+                                            <Setter Property="BorderThickness" Value="1, 1, 1, 0" />
+                                            <Setter Property="TextBlock.FontSize" Value="14" />
+                                            
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="AUTO" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" MaxWidth="120" />
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" />
+                                        <ColumnDefinition Width="12.5*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Margin="20, 0, 0, 0" Style="{StaticResource UpperBorder_Style}">
+                                        <Button x:Name="RemoveTunnel_Button"
+                                                Background="Transparent"
+                                                Click="RemoveTunnel_Button_Click"
+                                                Style="{StaticResource Button_DefaultStyle}">
+                                            <Image MaxHeight="14"
+                                                   Source="pack://application:,,,/Resources/Icons/fa-times-black.png"
+                                                   Style="{StaticResource Icon_Image_Style}" />
+                                        </Button>
+                                    </Border>
+                                    <Border Grid.Column="1"
+                                            Margin="0"
+                                            BorderThickness="0, 1, 1, 0"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <TextBlock Margin="50, 0, 50, 0"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center">
+                                            <Run Text="-1" />
+                                        </TextBlock>
+                                    </Border>
+                                    <Border Grid.Column="2"
+                                            Margin="10, 0, 0, 0"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <CheckBox x:Name="Premium_Button"
+                                                Background="Transparent"
+                                                Click="Premium_Button_Click"
+                                                Content="Premium"
+                                                Style="{StaticResource CloudView_CheckButton}" />
+                                    </Border>
+                                    <Border Grid.Column="3"
+                                            Margin="10, 0, 0, 0"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <CheckBox x:Name="Route_Button"
+                                                Background="Transparent"
+                                                Click="Route_Button_Click"
+                                                Content="Route"
+                                                Style="{StaticResource CloudView_CheckButton}" />
+                                    </Border>
+                                    <Border Grid.Column="4"
+                                            Margin="10, 0, 0, 0"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <CheckBox x:Name="Internet_Button"
+                                                Background="Transparent"
+                                                Click="Internet_Button_Click"
+                                                Content="Internet"
+                                                Style="{StaticResource CloudView_CheckButton}" />
+                                    </Border>
+                                    <Border Grid.Column="5"
+                                            Margin="10, 0, 0, 0"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <Button x:Name="Sponsoring_Button"
+                                                
+                                                
+                                                Click="Sponsoring_Button_Click"
+                                                Content="Sponsoring"
+                                                Style="{StaticResource Button_DefaultStyle}" >
+                                            <Button.Background>
+                                                <SolidColorBrush Color="Gray" Opacity="0.5" />
+                                            </Button.Background>
+                                        </Button>
+                                    </Border>
+                                    <Border Grid.Column="6"
+                                            Margin="10, 0, 0, 0"
+                                            Opacity="1"
+                                            Style="{StaticResource UpperBorder_Style}">
+                                        <CheckBox x:Name="Server_Button"
+                                                Background="#B9C3C8"
+                                                Click="Server_Button_Click"
+                                                Content="Server"
+                                                Style="{StaticResource CloudView_CheckButton}" />
+                                    </Border>
+                                    <Expander x:Name="TunnelView_Expander"
+                                              Grid.Row="1"
+                                              Grid.ColumnSpan="10"
+                                              Style="{StaticResource Expander_Style}">
+                                        <Expander.Header
+                                            >
+                                            <Grid Margin="15, 0, 15, 0"
+                                                  >
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition x:Name="ACL_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="CreateACL_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="AddTunnels_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="SaveAll_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="SelectAllTunnels_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="Groups_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="TunnelName_ColumnDefiniton" Width="11.5*" />
+                                                    <ColumnDefinition x:Name="BidirectionMode_ColumnDefiniton" Width="AUTO" />
+                                                    <ColumnDefinition x:Name="Location_ColumnDefiniton" Width="16.25*" />
+                                                    <ColumnDefinition x:Name="VPN_IP_ColumnDefiniton" Width="7*" />
+                                                    <ColumnDefinition x:Name="Points_ColumnDefiniton" Width="13.25*" />
+                                                    <ColumnDefinition x:Name="Real_IP_ColumnDefiniton" Width="13.25*" />
+                                                    <ColumnDefinition x:Name="Gateway_ColumnDefiniton" Width="13.25*" />
+                                                    <ColumnDefinition x:Name="Spacer" Width="15*" />
+                                                </Grid.ColumnDefinitions>
+                                                <local:PopupedContentControl x:Name="ACL_PopupedContentControl"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="ACL View">
+                                                    <ToggleButton x:Name="ACLView_ToggleButton" IsChecked="{Binding IsExpanded, ElementName=TunnelView_Expander, Mode=OneWayToSource}">
+                                                        <ToggleButton.Template>
+                                                            <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                                                <Image Source="pack://application:,,,/Resources/Icons/fa-eye-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                                                            </ControlTemplate>
+                                                        </ToggleButton.Template>
+                                                    </ToggleButton>
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="CrateACL_PopupedContentControl"
+                                                                             Grid.Column="1"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Create ACl">
+                                                    <Image Source="pack://application:,,,/Resources/Icons/fa-wrench-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="AddTunnels_PopupedContentControl"
+                                                                             Grid.Column="2"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Add clone">
+                                                    <Image Source="pack://application:,,,/Resources/Icons/fa-plus-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="SaveAll_PopupedContentControl"
+                                                                             Grid.Column="3"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Save this">
+                                                    <Image Source="pack://application:,,,/Resources/Icons/fa-save-blue.png" Style="{StaticResource Icon_Image_Style}" />
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="SelectThistunnel_PopupedContentControl"
+                                                                             Grid.Column="4"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Select this tunnel">
+                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Style="{StaticResource Checkbox_Style}" />
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="Groups_PopupedContentControl"
+                                                                             Grid.Column="5"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="0">
+                                                    <TextBlock Foreground="Maroon">
+                                                        <Run Text="A" />
+                                                    </TextBlock>
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="ThisTunnelName_PopupedContentControl"
+                                                                             Grid.Column="6"
+                                                                             HorizontalAlignment="Center"
+                                                                             Content="{Binding Name}"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="This tunnel name" />
+                                                <local:PopupedContentControl x:Name="BidirectionMode_PopupedContentControl"
+                                                                             Grid.Column="7"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Mode 1">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Image Source="pack://application:,,,/Resources/Icons/fa-chevron-left-black.png" Style="{StaticResource Icon_Image_Style}" />
+                                                        <Image Source="pack://application:,,,/Resources/Icons/fa-chevron-right-black.png" Style="{StaticResource Icon_Image_Style}" />
+                                                    </StackPanel>
+                                                </local:PopupedContentControl>
+                                                <local:PopupedContentControl x:Name="Location_PopupedContentControl"
+                                                                             Grid.Column="8"
+                                                                             HorizontalAlignment="Center"
+                                                                             Content="Select location"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Location not selected" />
+                                                <local:PopupedContentControl x:Name="VPN_IP_PopupedContentControl"
+                                                                             Grid.Column="9"
+                                                                             HorizontalAlignment="Center"
+                                                                             Content="{Binding VPN_IP}"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="VPN IP" />
+                                                <local:PopupedContentControl x:Name="Points_PopupedContentControl"
+                                                                             Grid.Column="10"
+                                                                             HorizontalAlignment="Center"
+                                                                             Content="{Binding Points}"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Tunnel points" />
+                                                <local:PopupedContentControl x:Name="Real_IP_PopupedContentControl"
+                                                                             Grid.Column="11"
+                                                                             HorizontalAlignment="Center"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="Real IP">
+                                                    <ComboBox ItemsSource="{Binding Real_IPs}" />
+                                                </local:PopupedContentControl>
+                                                <!---->
+                                                <!--<local:PopupedContentControl x:Name="Gateway_PopupedContentControl"
+                                                                             Grid.Column="12"
+                                                                             HorizontalAlignment="Center"
+                                                                             Content="{Binding Gateway}"
+                                                                             IsForACLView="True"
+                                                                             PopupContent="{Binding Gateway}" />-->
+                                                <CheckBox IsChecked="{Binding Gateway}" 
+                                                          Grid.Column="12" 
+                                                          HorizontalAlignment="Center"
+                                                          Style="{StaticResource CheckBox_RedGreen_Style}"/>
+                                                <StackPanel Grid.Column="13" Orientation="Horizontal">
+                                                    <ToggleButton x:Name="IsEditable_ToggleButton"
+                                                                  Margin="10, 0, 0, 0"
+                                                                  Style="{StaticResource ToggleButton_DefaultStyle}" />
+                                                    <local:PopupedContentControl x:Name="DeleteThisTunnel_PopupContentControl"
+                                                                                 Margin="10, 0, 0, 0"
+                                                                                 IsForACLView="True"
+                                                                                 PopupContent="Delete this tunnel">
+                                                        <Image Source="pack://application:,,,/Resources/Icons/fa-trash-red.png" Style="{StaticResource Icon_Image_Style}" />
+                                                    </local:PopupedContentControl>
+                                                    <Ellipse Width="14"
+                                                             Height="14"
+                                                             Margin="10, 0, 0, 0"
+                                                             Fill="{Binding IsActive,
+                                                                            Converter={StaticResource BoolToColorConverter}}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Expander.Header>
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="AUTO" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <local:ACLView x:Name="firstAclControl" DataContext="{Binding SourceACL}" IsSource="True" />
+                                            <ItemsControl Grid.Row="1" ItemsSource="{Binding DestinationACLs}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate DataType="{x:Type vm:ACL_VM}">
+                                                        <Grid>
+                                                            <local:ACLView DataContext="{Binding}" IsSource="False" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
+                                    </Expander>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#B9B9B9" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+        <StackPanel Grid.Row="3"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+            <!--<Button Name="Btn1"
+                    Click="Btn1_Click"
+                    Style="{StaticResource Button_Page_Selector}">
+                1
+            </Button>
+            <Button Name="Btn2"
+                    Click="Btn2_Click"
+                    Style="{StaticResource Button_Page_Selector}">
+                2
+            </Button>
+            <Button Name="Bt3"
+                    Click="Bt3_Click"
+                    Style="{StaticResource Button_Page_Selector}">
+                3
+            </Button>-->
+            <RadioButton  Name="Btn1"
+                    Click="Btn1_Click"
+                       Style="{StaticResource ToggleButton_PageSelector_Left}">
+                1
+            </RadioButton>
+            <RadioButton  Name="Btn2"
+                    Click="Btn2_Click"
+                          Style="{StaticResource ToggleButton_PageSelector}">
+                2
+            </RadioButton>
+            <RadioButton  Name="Bt3"
+                    Click="Bt3_Click"
+                          Style="{StaticResource ToggleButton_PageSelector_Right}">
+                3
+            </RadioButton>
+        </StackPanel>
+    </Grid>
+</UserControl>

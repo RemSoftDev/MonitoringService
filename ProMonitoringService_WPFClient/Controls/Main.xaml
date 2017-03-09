@@ -1,0 +1,98 @@
+﻿<UserControl x:Class="ProMonitoringService_WPFClient.Controls.Main"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ProMonitoringService_WPFClient.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="800"
+             d:DesignWidth="1080"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="MainContentHolder_TabItem_Style" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border>
+                            <Border>
+                                <ContentPresenter ContentSource="Header" />
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Padding" Value="25, 5, 25, 5" />
+                                        <Setter Property="TextBlock.TextAlignment" Value="Center" />
+                                        <Setter Property="TextBlock.FontSize" Value="20" />
+                                        <Setter Property="BorderThickness" Value="0, 0, 0, 4" />
+                                        <Setter Property="BorderBrush" Value="Transparent" />
+                                        <Setter Property="TextBlock.Foreground" Value="DarkGray" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TabItem}, Mode=FindAncestor}}" Value="True">
+                                                <Setter Property="BorderBrush" Value="#FFA500" />
+                                                <Setter Property="TextBlock.Foreground" Value="Black" />
+                                            </DataTrigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="TextBlock.Foreground" Value="Black" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderThickness" Value="0, 0, 0, 3" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Style.Triggers>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Border BorderThickness="0,0,0,4" Height="75" Width="AUTO" BorderBrush="#D8D8D8" VerticalAlignment="Top" HorizontalAlignment="Stretch"/>
+        <TabControl Name="MainContentHolder_TabControl"
+                    Margin="0, 40, 0, 0"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    FontSize="16"
+                    ItemContainerStyle="{StaticResource MainContentHolder_TabItem_Style}">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image MaxHeight="16" Source="pack://application:,,,/Resources/Icons/fa-codepen-black.png" />
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Home</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                TabContent
+            </TabItem>
+            <TabItem IsSelected="True">
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image MaxHeight="16" Source="pack://application:,,,/Resources/Icons/fa-dribbble-black.png" />
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Connectivity Manager</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <local:ConnectivityManager Margin="0, 25, 0, 0" />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image MaxHeight="16" Source="pack://application:,,,/Resources/Icons/fa-dropbox-black.png" />
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Profile</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                <local:ProfileInfo />
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image MaxHeight="16" Source="pack://application:,,,/Resources/Icons/fa-drupal-black.png" />
+                        <TextBlock Margin="5, 0, 0, 0" VerticalAlignment="Center">Profile</TextBlock>
+                    </StackPanel>
+                </TabItem.Header>
+                TabContent
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

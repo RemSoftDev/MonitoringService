@@ -1,0 +1,131 @@
+﻿<UserControl x:Class="ProMonitoringService_WPFClient.Controls.ConnectivityManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ProMonitoringService_WPFClient.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:ProMonitoringService_WPFClient.ViewModels"
+             Name="ThisUserControl"
+             d:DesignHeight="300"
+             d:DesignWidth="1000"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="LeftScrollViewer_Style" TargetType="{x:Type ScrollViewer}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <ScrollBar Name="PART_VerticalScrollBar"
+                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                                       Value="{TemplateBinding VerticalOffset}" />
+
+                            <ScrollContentPresenter Grid.Column="1" Margin="10, 0, 0, 0" />
+                            <ScrollBar Name="PART_HorizontalScrollBar"
+                                       Grid.Row="1"
+                                       Grid.Column="1"
+                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                       Orientation="Horizontal"
+                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                                       Value="{TemplateBinding HorizontalOffset}" />
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Expander_Style" TargetType="Expander">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Expander">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition MaxHeight="300" />
+                            </Grid.RowDefinitions>
+                            <Border Name="HeaderIcons_Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="Black"
+                                    BorderThickness="2"
+                                    CornerRadius="10"
+                                    Padding="5">
+                                <ContentPresenter ContentSource="Header" />
+                            </Border>
+                            <Border Name="ContentContainer_Border"
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="15"
+                                    Margin="15, 0, 15, 10"
+                                    Background="White"
+                                    BorderBrush="Black"
+                                    BorderThickness="2, 0, 2, 2"
+                                    CornerRadius="0, 0, 10, 10"
+                                    Padding="10"
+                                    Visibility="Collapsed">
+                                <ScrollViewer MaxHeight="250" Style="{StaticResource LeftScrollViewer_Style}">
+                                    <ContentPresenter />
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="Expander.IsExpanded" Value="True">
+                                <Setter TargetName="ContentContainer_Border" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="HeaderIcons_Border" Property="Border.BorderBrush" Value="#66AFE9" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="AUTO" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="AUTO" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Filter: " FontSize="21" FontFamily="Calibri" Margin="0,5" Foreground="#404040"/>
+            <ComboBox Name="Clouds_ComboBox"
+                      Height="{Binding ActualHeight,
+                                       ElementName=CreateCloud_Button}"
+                      Margin="5, 0, 0, 0"
+                      VerticalAlignment="Top"
+                      Background="White"
+                      DisplayMemberPath="Name"
+                      SelectionChanged="Clouds_ComboBox_SelectionChanged"
+                      Width="220"
+                      IsEditable="False"  ContextMenuOpening="Clouds_ComboBox_ContextMenuOpening" DropDownOpened="Clouds_ComboBox_DropDownOpened" Style="{DynamicResource ComboBoxStyle3}"
+                      Foreground="Gray">
+
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Width" Value="210"/>
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+            <Button Name="CreateCloud_Button"
+                    Margin="50, 0, 0, 0"
+                    Click="CreateCloud_Button_Click"
+                    Content="Create cloud"
+                    Style="{StaticResource MainWindow_Button_Style}" 
+                    >
+                
+            </Button>
+        </StackPanel>
+        <ContentControl Name="CloudViewPlaceholder_ContentControl" Grid.Row="1" />
+    </Grid>
+</UserControl>
